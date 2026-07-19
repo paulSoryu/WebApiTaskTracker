@@ -19,35 +19,35 @@ namespace WebApiTaskTracker.Endpoints
         private static async Task<IResult> GetAllTasks(ITaskService taskService)
         {
             // Implement logic to retrieve all tasks from the database or any other data source
-            var tasks = await taskService.GetAllTasksAsync();
+            var tasks = await taskService.GetAllAsync();
             return Results.Ok(tasks);
         }
 
         private static async Task<IResult> GetTaskById(int id, ITaskService taskService)
         {
             // Implement logic to retrieve a task by its ID from the database or any other data source
-            var task = await taskService.GetTaskByIdAsync(id);
+            var task = await taskService.GetByIdAsync(id);
             return Results.Ok(task);
         }
 
         private static async Task<IResult> CreateTask(CreateTaskRequest taskRequest, ITaskService taskService)
         {
             // Implement logic to create a new task in the database or any other data source
-            TaskResponse createdTask = await taskService.CreateTaskAsync(taskRequest);
+            TaskResponse createdTask = await taskService.CreateAsync(taskRequest);
             return Results.CreatedAtRoute("GetTaskById", new { id = createdTask.Id }, createdTask);
         }
 
         private static async Task<IResult> UpdateTask(int id, UpdateTaskRequest taskRequest, ITaskService taskService)
         {
             // Implement logic to update an existing task in the database or any other data source
-            await taskService.UpdateTaskAsync(id, taskRequest);
+            await taskService.UpdateAsync(id, taskRequest);
             return Results.NoContent();
         }
 
         private static async Task<IResult> DeleteTask(int id, ITaskService taskService)
         {
             // Implement logic to delete a task by its ID from the database or any other data source
-            await taskService.DeleteTaskAsync(id);
+            await taskService.DeleteAsync(id);
             return Results.NoContent();
         }
     }

@@ -4,10 +4,10 @@ namespace WebApiTaskTracker.Services.Tasks
 {
     public interface ITaskService
     {
-        Task<TaskResponse?> GetTaskByIdAsync(int id);
-        Task<IEnumerable<TaskSummaryResponse>> GetAllTasksAsync();
-        Task<TaskResponse> CreateTaskAsync(CreateTaskRequest task);
-        Task UpdateTaskAsync(int id, UpdateTaskRequest task);
-        Task DeleteTaskAsync(int id);
+        Task<TaskResponse?> GetByIdAsync(int id);
+        Task<IEnumerable<TaskSummaryResponse>> GetAllAsync();
+        Task<TaskResponse> CreateAsync(CreateTaskRequest task);
+        Task UpdateAsync(int id, UpdateTaskRequest task);
+        Task DeleteAsync(int id);
     }
 }
