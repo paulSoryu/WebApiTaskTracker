@@ -1,4 +1,4 @@
-﻿namespace WebApiTaskTracker.Models
+﻿namespace WebApiTaskTracker.Data
 {
     public class TaskItem
     {

@@ -1,4 +1,5 @@
 ﻿using WebApiTaskTracker.DTOs.Tasks;
+using WebApiTaskTracker.Data;
 
 namespace WebApiTaskTracker.Services.Tasks
 {
@@ -32,7 +33,15 @@ namespace WebApiTaskTracker.Services.Tasks
 
         public Task<TaskResponse> CreateAsync(CreateTaskRequest task)
         {
-            throw new NotImplementedException();
+            var result = _db.Add(new TaskItem
+            {
+                Title = task.Title,
+                Description = task.Description,
+                Category = task.Category,
+                DueDate = task.DueDate,
+                Priority = task.Priority
+            });
+            return Task.FromResult(new TaskResponse(result.Id, result.Title, result.Description, result.Category, result.DueDate, result.Priority));
         }
 
         public Task UpdateAsync(int id, UpdateTaskRequest task)
