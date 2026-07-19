@@ -14,7 +14,11 @@ namespace WebApiTaskTracker.Services.Tasks
 
         public Task<TaskResponse?> GetByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            var task = _db[id];
+            if (task == null)
+                return Task.FromResult<TaskResponse?>(null);
+
+            return Task.FromResult(new TaskResponse(task.Id, task.Title, task.Description, task.Category, task.DueDate, task.Priority));
         }
 
         public Task<IEnumerable<TaskSummaryResponse>> GetAllAsync()
@@ -46,12 +50,24 @@ namespace WebApiTaskTracker.Services.Tasks
 
         public Task UpdateAsync(int id, UpdateTaskRequest task)
         {
-            throw new NotImplementedException();
+            var existingTask = _db[id];
+            if (existingTask == null)
+                return Task.CompletedTask;
+
+            existingTask.Title = task.Title;
+            existingTask.Description = task.Description;
+            existingTask.Category = task.Category;
+            existingTask.DueDate = task.DueDate;
+            existingTask.Priority = task.Priority;
+
+            _db[id] = existingTask;
+            return Task.CompletedTask;
         }
 
         public Task DeleteAsync(int id)
         {
-            throw new NotImplementedException();
+            _db.Remove(id);
+            return Task.CompletedTask;
         }
     }
 }
