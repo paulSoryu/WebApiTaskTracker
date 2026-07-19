@@ -15,9 +15,8 @@
   <ItemGroup>
     <Folder Include="Data\Entities\" />
     <Folder Include="DTOs\Users\" />
-    <Folder Include="Endpoints\" />
     <Folder Include="Middleware\" />
-    <Folder Include="Services\" />
+    <Folder Include="Services\Users\" />
   </ItemGroup>
 
 </Project>
