@@ -1,3 +1,4 @@
+using FluentValidation;
 using Scalar.AspNetCore;
 using WebApiTaskTracker.Endpoints;
 using WebApiTaskTracker.Services.Tasks;
@@ -7,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddSingleton<TasksDb>();
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 // Access by adding /scalar to the base URL of the API. For example, https://localhost:5001/scalar
 builder.Services.AddOpenApi();

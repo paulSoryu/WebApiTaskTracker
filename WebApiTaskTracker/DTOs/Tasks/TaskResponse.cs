@@ -1,4 +1,6 @@
-﻿namespace WebApiTaskTracker.DTOs.Tasks
+﻿using WebApiTaskTracker.Data.Entities;
+
+namespace WebApiTaskTracker.DTOs.Tasks
 {
     public record TaskResponse(
         int Id,
@@ -9,5 +11,16 @@
         int Priority
     )
     {
+        public static TaskResponse FromEntity(TaskEntity entity)
+        {
+            return new TaskResponse(
+                Id: entity.Id,
+                Title: entity.Title,
+                Description: entity.Description,
+                Category: entity.Category,
+                DueDate: entity.DueDate,
+                Priority: entity.Priority
+            );
+        }
     }
 }
