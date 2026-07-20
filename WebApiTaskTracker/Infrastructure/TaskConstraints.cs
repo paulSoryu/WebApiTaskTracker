@@ -1,4 +1,4 @@
-﻿namespace WebApiTaskTracker
+﻿namespace WebApiTaskTracker.Infrastructure
 {
     public class TaskConstraints
     {

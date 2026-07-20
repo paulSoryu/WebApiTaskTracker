@@ -2,6 +2,7 @@ using FluentValidation;
 using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
 using Scalar.AspNetCore;
 using WebApiTaskTracker.Endpoints;
+using WebApiTaskTracker.Infrastructure;
 using WebApiTaskTracker.Services.Tasks;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +11,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddSingleton<TasksDb>();
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 // Access by adding /scalar to the base URL of the API. For example, https://localhost:5001/scalar
 builder.Services.AddOpenApi();
@@ -32,6 +35,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseExceptionHandler();
 
 // app.MapUserEndpoints();
 app.MapTaskEndpoints();
