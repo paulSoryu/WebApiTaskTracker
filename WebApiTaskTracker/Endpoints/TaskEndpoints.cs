@@ -1,4 +1,5 @@
-﻿using WebApiTaskTracker.DTOs.Tasks;
+﻿using WebApiTaskTracker.DTOs;
+using WebApiTaskTracker.DTOs.Tasks;
 using WebApiTaskTracker.Services.Tasks;
 
 namespace WebApiTaskTracker.Endpoints
@@ -11,8 +12,10 @@ namespace WebApiTaskTracker.Endpoints
 
             routeGroup.MapGet("/", GetAllTasks);
             routeGroup.MapGet("/{id:int}", GetTaskById).WithName("GetTaskById");
-            routeGroup.MapPost("/", CreateTask);
-            routeGroup.MapPut("/{id:int}", UpdateTask);
+            routeGroup.MapPost("/", CreateTask)
+                .AddEndpointFilter<ValidationFilter<CreateTaskRequest>>();
+            routeGroup.MapPut("/{id:int}", UpdateTask)
+                .AddEndpointFilter<ValidationFilter<UpdateTaskRequest>>(); ;
             routeGroup.MapDelete("/{id:int}", DeleteTask);
         }
 

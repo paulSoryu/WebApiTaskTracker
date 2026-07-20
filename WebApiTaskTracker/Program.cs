@@ -1,4 +1,5 @@
 using FluentValidation;
+using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
 using Scalar.AspNetCore;
 using WebApiTaskTracker.Endpoints;
 using WebApiTaskTracker.Services.Tasks;
@@ -16,6 +17,7 @@ builder.Services.AddOpenApi();
 // Access by adding /swagger to the base URL of the API. For example, https://localhost:5001/swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddFluentValidationRulesToSwagger();
 
 var app = builder.Build();
 
@@ -31,6 +33,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// app.MapUserEndpoints();
 app.MapTaskEndpoints();
 
 app.Run();

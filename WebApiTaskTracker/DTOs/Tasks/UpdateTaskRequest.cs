@@ -20,9 +20,9 @@ namespace WebApiTaskTracker.DTOs.Tasks
             entity.Priority = this.Priority;
         }
     }
-    public class UpdateTaskRequestValidator : AbstractValidator<UpdateTaskRequest>
+    internal class Validator : AbstractValidator<UpdateTaskRequest>
     {
-        public UpdateTaskRequestValidator()
+        public Validator()
         {
             RuleFor(x => x.Title)
                 .NotEmpty().WithMessage("Title cannot be empty.")
