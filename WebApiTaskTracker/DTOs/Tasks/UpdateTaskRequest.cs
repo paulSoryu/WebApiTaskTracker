@@ -26,10 +26,10 @@ namespace WebApiTaskTracker.DTOs.Tasks
         {
             RuleFor(x => x.Title)
                 .NotEmpty().WithMessage("Title cannot be empty.")
-                .Length(3, 100).WithMessage("Title must be between 3 and 100 characters.");
+                .Length(3, 50).WithMessage("Title must be between 3 and 100 characters.");
 
             RuleFor(x => x.Description)
-                .MaximumLength(1000).WithMessage("Description must be at most 1000 characters.");
+                .MaximumLength(500).WithMessage("Description must be at most 1000 characters.");
 
             RuleFor(x => x.Category)
                 .NotEmpty().WithMessage("Category cannot be empty.");
