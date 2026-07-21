@@ -11,12 +11,12 @@ namespace WebApiTaskTracker.Endpoints
             var routeGroup = endpoints.MapGroup("/api/tasks");
 
             routeGroup.MapGet("/", GetAllTasks);
-            routeGroup.MapGet("/{id:int}", GetTaskById).WithName("GetTaskById");
+            routeGroup.MapGet("/{id:Guid}", GetTaskById).WithName("GetTaskById");
             routeGroup.MapPost("/", CreateTask)
                 .AddEndpointFilter<ValidationFilter<CreateTaskRequest>>();
-            routeGroup.MapPut("/{id:int}", UpdateTask)
+            routeGroup.MapPut("/{id:Guid}", UpdateTask)
                 .AddEndpointFilter<ValidationFilter<UpdateTaskRequest>>(); ;
-            routeGroup.MapDelete("/{id:int}", DeleteTask);
+            routeGroup.MapDelete("/{id:Guid}", DeleteTask);
         }
 
         private static async Task<IResult> GetAllTasks(ITaskService taskService)
@@ -25,7 +25,7 @@ namespace WebApiTaskTracker.Endpoints
             return Results.Ok(tasks);
         }
 
-        private static async Task<IResult> GetTaskById(int id, ITaskService taskService)
+        private static async Task<IResult> GetTaskById(Guid id, ITaskService taskService)
         {
             var task = await taskService.GetByIdAsync(id);
             return Results.Ok(task);
@@ -37,13 +37,13 @@ namespace WebApiTaskTracker.Endpoints
             return Results.CreatedAtRoute("GetTaskById", new { id = createdTask.Id }, createdTask);
         }
 
-        private static async Task<IResult> UpdateTask(int id, UpdateTaskRequest taskRequest, ITaskService taskService)
+        private static async Task<IResult> UpdateTask(Guid id, UpdateTaskRequest taskRequest, ITaskService taskService)
         {
             await taskService.UpdateAsync(id, taskRequest);
             return Results.NoContent();
         }
 
-        private static async Task<IResult> DeleteTask(int id, ITaskService taskService)
+        private static async Task<IResult> DeleteTask(Guid id, ITaskService taskService)
         {
             await taskService.DeleteAsync(id);
             return Results.NoContent();

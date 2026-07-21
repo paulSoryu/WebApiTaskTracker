@@ -3,7 +3,7 @@
 namespace WebApiTaskTracker.DTOs.Tasks
 {
     public record TaskResponse(
-        int Id,
+        Guid Id,
         string Title,
         string? Description,
         string? Category,

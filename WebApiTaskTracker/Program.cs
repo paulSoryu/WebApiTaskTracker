@@ -2,16 +2,16 @@ using FluentValidation;
 using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
-using WebApiTaskTracker.Data;
 using WebApiTaskTracker.Endpoints;
 using WebApiTaskTracker.Infrastructure;
 using WebApiTaskTracker.Services.Tasks;
+using WebApiTaskTracker.DTOs.Tasks;
+using WebApiTaskTracker.Data.Databases;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddScoped<ITaskService, TaskService>();
-builder.Services.AddSingleton<TasksDb>();
 
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 builder.Services.AddProblemDetails();

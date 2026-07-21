@@ -1,58 +1,59 @@
-﻿using WebApiTaskTracker.DTOs.Tasks;
-using WebApiTaskTracker.Data;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using WebApiTaskTracker.Data.Databases;
+using WebApiTaskTracker.DTOs.Tasks;
 
 namespace WebApiTaskTracker.Services.Tasks
 {
     public class TaskService : ITaskService
     {
-        private readonly TasksDb _db;
+        private readonly TaskTrackerDbContext _db;
 
-        public TaskService(TasksDb db)
+        public TaskService(TaskTrackerDbContext db)
         {
             _db = db;
         }
 
-        public Task<TaskResponse?> GetByIdAsync(int id)
+        public async Task<TaskResponse?> GetByIdAsync(Guid id)
         {
-            var task = _db[id];
+            var task = await _db.Tasks.FindAsync(id);
             if (task == null)
-                return Task.FromResult<TaskResponse?>(null);
+                return null;
 
-            return Task.FromResult(new TaskResponse(task.Id, task.Title, task.Description, task.Category, task.DueDate, task.Priority));
+            return new TaskResponse(task.Id, task.Title, task.Description, task.Category, task.DueDate, task.Priority);
         }
 
-        public Task<IEnumerable<TaskSummaryResponse>> GetAllAsync()
+        public async Task<IEnumerable<TaskSummaryResponse>> GetAllAsync()
         {
-            var result = _db.GetAll()
+            var result = await _db.Tasks
                 .Select(p => new TaskSummaryResponse(
                     p.Id,
                     p.Title,
                     p.Category,
                     p.DueDate,
                     p.Priority))
-                .ToList(); // materialize to avoid deferred-execution issues
+                .ToListAsync(); // materialize to avoid deferred-execution issues
 
-            return Task.FromResult<IEnumerable<TaskSummaryResponse>>(result);
+            return result;
         }
 
-        public Task<TaskResponse> CreateAsync(CreateTaskRequest task)
+        public async Task<TaskResponse> CreateAsync(CreateTaskRequest task)
         {
-            var result = _db.Add(new TaskItem
-            {
-                Title = task.Title,
-                Description = task.Description,
-                Category = task.Category,
-                DueDate = task.DueDate,
-                Priority = task.Priority
-            });
-            return Task.FromResult(new TaskResponse(result.Id, result.Title, result.Description, result.Category, result.DueDate, result.Priority));
+            var entity = task.ToEntity();
+            var entry = await _db.AddAsync(entity);
+            await _db.SaveChangesAsync();
+
+            var result = entry.Entity;
+            return new TaskResponse(result.Id, result.Title, result.Description, result.Category, result.DueDate, result.Priority);
         }
 
-        public Task UpdateAsync(int id, UpdateTaskRequest task)
+        public async Task UpdateAsync(Guid id, UpdateTaskRequest task)
         {
-            var existingTask = _db[id];
+            var existingTask = await _db.Tasks.FindAsync(id);
             if (existingTask == null)
-                return Task.CompletedTask;
+                return;
 
             existingTask.Title = task.Title;
             existingTask.Description = task.Description;
@@ -60,14 +61,18 @@ namespace WebApiTaskTracker.Services.Tasks
             existingTask.DueDate = task.DueDate;
             existingTask.Priority = task.Priority;
 
-            _db[id] = existingTask;
-            return Task.CompletedTask;
+            _db.Update(existingTask);
+            await _db.SaveChangesAsync();
         }
 
-        public Task DeleteAsync(int id)
+        public async Task DeleteAsync(Guid id)
         {
-            _db.Remove(id);
-            return Task.CompletedTask;
+            var existingTask = await _db.Tasks.FindAsync(id);
+            if (existingTask == null)
+                return;
+
+            _db.Remove(existingTask);
+            await _db.SaveChangesAsync();
         }
     }
 }
