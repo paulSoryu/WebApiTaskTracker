@@ -1,6 +1,8 @@
 ﻿using FluentValidation;
 using WebApiTaskTracker.Data.Entities;
 
+// this is a DTO for updating a task, including validation rules and a method to update a TaskEntity with the values from this DTO
+// this breaks the single responsibility principle, as the DTO is responsible for data transfer, conversion and validation, but it is convenient for this simple app
 namespace WebApiTaskTracker.DTOs.Tasks
 {
     public record UpdateTaskRequest(

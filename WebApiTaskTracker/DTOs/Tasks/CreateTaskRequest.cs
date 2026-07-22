@@ -2,6 +2,8 @@
 using FluentValidation;
 using WebApiTaskTracker.Data.Entities;
 
+// this is a DTO for creating a task, including validation rules and a method to convert the DTO to a TaskEntity
+// this breaks the single responsibility principle, as the DTO is responsible for data transfer, conversion and validation, but it is convenient for this simple app
 namespace WebApiTaskTracker.DTOs.Tasks
 {
     public record CreateTaskRequest(

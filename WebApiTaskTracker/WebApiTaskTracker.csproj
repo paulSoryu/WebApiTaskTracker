@@ -23,9 +23,9 @@
 
   <ItemGroup>
     <Folder Include="Data\Configurations\" />
+    <Folder Include="DTOs\Categories\" />
     <Folder Include="DTOs\Users\" />
     <Folder Include="Middleware\" />
-    <Folder Include="Services\Users\" />
   </ItemGroup>
 
 </Project>

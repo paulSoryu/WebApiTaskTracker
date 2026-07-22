@@ -14,7 +14,7 @@ namespace WebApiTaskTracker.Infrastructure
                     error = "Invalid request content. Ensure body is not empty and JSON is valid."
                 }, cancellationToken);
 
-                return true; // Ошибка обработана
+                return true;
             }
             return false;
         }

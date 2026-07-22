@@ -51,5 +51,6 @@ app.UseExceptionHandler();
 
 // app.MapUserEndpoints();
 app.MapTaskEndpoints();
+// app.MapCategoryEndpoints();
 
 app.Run();

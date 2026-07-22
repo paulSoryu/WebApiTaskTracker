@@ -1,4 +1,6 @@
-﻿namespace WebApiTaskTracker.Data.Entities
+﻿using WebApiTaskTracker.DTOs.Tasks;
+
+namespace WebApiTaskTracker.Data.Entities
 {
     public class TaskEntity
     {

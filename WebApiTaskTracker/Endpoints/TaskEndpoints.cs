@@ -15,7 +15,7 @@ namespace WebApiTaskTracker.Endpoints
             routeGroup.MapPost("/", CreateTask)
                 .AddEndpointFilter<ValidationFilter<CreateTaskRequest>>();
             routeGroup.MapPut("/{id:Guid}", UpdateTask)
-                .AddEndpointFilter<ValidationFilter<UpdateTaskRequest>>(); ;
+                .AddEndpointFilter<ValidationFilter<UpdateTaskRequest>>();
             routeGroup.MapDelete("/{id:Guid}", DeleteTask);
         }
 

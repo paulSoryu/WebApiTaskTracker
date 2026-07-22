@@ -34,7 +34,7 @@ namespace WebApiTaskTracker.Services.Tasks
                     p.Category,
                     p.DueDate,
                     p.Priority))
-                .ToListAsync(); // materialize to avoid deferred-execution issues
+                .ToListAsync();
 
             return result;
         }

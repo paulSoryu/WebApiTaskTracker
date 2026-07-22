@@ -1,5 +1,7 @@
 ﻿using WebApiTaskTracker.Data.Entities;
 
+// this is a DTO for returning task information, including a method to convert a TaskEntity to this DTO
+// this breaks the single responsibility principle, as the DTO is responsible for both data transfer and conversion, but it is convenient for this simple app
 namespace WebApiTaskTracker.DTOs.Tasks
 {
     public record TaskResponse(
