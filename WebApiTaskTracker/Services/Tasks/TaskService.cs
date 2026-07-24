@@ -1,78 +1,84 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using WebApiTaskTracker.Data.Databases;
+using WebApiTaskTracker.Data.Entities;
 using WebApiTaskTracker.DTOs.Tasks;
+using WebApiTaskTracker.Utilities;
 
-namespace WebApiTaskTracker.Services.Tasks
+namespace WebApiTaskTracker.Services.Tasks;
+
+public class TaskService : ITaskService
 {
-    public class TaskService : ITaskService
+    private readonly TaskTrackerDbContext _db;
+
+    public TaskService(TaskTrackerDbContext db)
     {
-        private readonly TaskTrackerDbContext _db;
+        _db = db;
+    }
 
-        public TaskService(TaskTrackerDbContext db)
+    public async Task<TaskResponse?> GetByIdAsync(Guid id)
+    {
+        var task = await _db.Tasks.FindAsync(id);
+        if (task == null)
+            return null;
+
+        return TaskResponse.FromEntity(task);
+    }
+
+    public async Task<IEnumerable<TaskSummaryResponse>> GetAllAsync()
+    {
+        var result = await _db.Tasks
+            .Select(p => TaskSummaryResponse.FromEntity(p))
+            .ToListAsync();
+
+        return result;
+    }
+
+    // Bug with categoryEntity trying to write into categories List
+    public async Task<TaskResponse> CreateAsync(CreateTaskRequest task, Guid userId)
+    {
+        CategoryEntity? category = null;
+
+        if (!string.IsNullOrWhiteSpace(task.Category))
         {
-            _db = db;
+            var normalizedName = task.Category.Trim();
+
+            category = await _db.Categories.FirstOrDefaultAsync(c => c.Title.ToLower() == normalizedName.ToLower());
+
+            if (category == null)
+            {
+                category = new CategoryEntity { Title = normalizedName, UserId = userId};
+                _db.Categories.Add(category); 
+            }
         }
 
-        public async Task<TaskResponse?> GetByIdAsync(Guid id)
-        {
-            var task = await _db.Tasks.FindAsync(id);
-            if (task == null)
-                return null;
+        var entity = task.ToEntity(category, userId);
+        _db.Tasks.Add(entity);
 
-            return new TaskResponse(task.Id, task.Title, task.Description, task.Category, task.DueDate, task.Priority);
-        }
+        await _db.SaveChangesAsync();
+        return TaskResponse.FromEntity(entity);
+    }
 
-        public async Task<IEnumerable<TaskSummaryResponse>> GetAllAsync()
-        {
-            var result = await _db.Tasks
-                .Select(p => new TaskSummaryResponse(
-                    p.Id,
-                    p.Title,
-                    p.Category,
-                    p.DueDate,
-                    p.Priority))
-                .ToListAsync();
+    public async Task UpdateAsync(Guid id, UpdateTaskRequest task)
+    {
+        var existingTask = await _db.Tasks.FindAsync(id);
+        if (existingTask == null)
+            throw new EntityNotFoundException($"Task {id} not found.");
 
-            return result;
-        }
+        task.UpdateEntity(existingTask);
+        await _db.SaveChangesAsync();
+    }
 
-        public async Task<TaskResponse> CreateAsync(CreateTaskRequest task)
-        {
-            var entity = task.ToEntity();
-            var entry = await _db.AddAsync(entity);
-            await _db.SaveChangesAsync();
+    public async Task DeleteAsync(Guid id)
+    {
+        var existingTask = await _db.Tasks.FindAsync(id);
+        if (existingTask == null)
+            throw new EntityNotFoundException($"Task {id} not found.");
 
-            var result = entry.Entity;
-            return new TaskResponse(result.Id, result.Title, result.Description, result.Category, result.DueDate, result.Priority);
-        }
-
-        public async Task UpdateAsync(Guid id, UpdateTaskRequest task)
-        {
-            var existingTask = await _db.Tasks.FindAsync(id);
-            if (existingTask == null)
-                return;
-
-            existingTask.Title = task.Title;
-            existingTask.Description = task.Description;
-            existingTask.Category = task.Category;
-            existingTask.DueDate = task.DueDate;
-            existingTask.Priority = task.Priority;
-
-            _db.Update(existingTask);
-            await _db.SaveChangesAsync();
-        }
-
-        public async Task DeleteAsync(Guid id)
-        {
-            var existingTask = await _db.Tasks.FindAsync(id);
-            if (existingTask == null)
-                return;
-
-            _db.Remove(existingTask);
-            await _db.SaveChangesAsync();
-        }
+        _db.Remove(existingTask);
+        await _db.SaveChangesAsync();
     }
 }

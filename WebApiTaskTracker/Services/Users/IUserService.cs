@@ -1,6 +1,5 @@
-﻿namespace WebApiTaskTracker.Services.Users
+﻿namespace WebApiTaskTracker.Services.Users;
+
+public interface IUserService
 {
-    public interface IUserService
-    {
-    }
 }

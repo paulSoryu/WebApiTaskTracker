@@ -1,6 +1,5 @@
-﻿namespace WebApiTaskTracker.Services.Categories
+﻿namespace WebApiTaskTracker.Services.Categories;
+
+public class CategoryService : ICategoryService
 {
-    public class CategoryService
-    {
-    }
 }

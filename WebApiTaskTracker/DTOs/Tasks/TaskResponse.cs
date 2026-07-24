@@ -2,27 +2,26 @@
 
 // this is a DTO for returning task information, including a method to convert a TaskEntity to this DTO
 // this breaks the single responsibility principle, as the DTO is responsible for both data transfer and conversion, but it is convenient for this simple app
-namespace WebApiTaskTracker.DTOs.Tasks
+namespace WebApiTaskTracker.DTOs.Tasks;
+
+public record TaskResponse(
+    Guid Id,
+    string Title,
+    string? Description,
+    string? Category,
+    DateTime? DueDate,
+    int Priority
+)
 {
-    public record TaskResponse(
-        Guid Id,
-        string Title,
-        string? Description,
-        string? Category,
-        DateTime? DueDate,
-        int Priority
-    )
+    public static TaskResponse FromEntity(TaskEntity entity)
     {
-        public static TaskResponse FromEntity(TaskEntity entity)
-        {
-            return new TaskResponse(
-                Id: entity.Id,
-                Title: entity.Title,
-                Description: entity.Description,
-                Category: entity.Category,
-                DueDate: entity.DueDate,
-                Priority: entity.Priority
-            );
-        }
+        return new TaskResponse(
+            Id: entity.Id,
+            Title: entity.Title,
+            Description: entity.Description,
+            Category: entity.Category?.Title ?? "",
+            DueDate: entity.DueDate,
+            Priority: entity.Priority
+        );
     }
 }
