@@ -54,6 +54,20 @@ using (var scope = app.Services.CreateScope())
     context.Database.Migrate();
 }
 
+app.UseExceptionHandler();
+app.UseStatusCodePages(async context =>
+{
+    if (context.HttpContext.Response.StatusCode == StatusCodes.Status401Unauthorized)
+    {
+        context.HttpContext.Response.ContentType = "application/json";
+        await context.HttpContext.Response.WriteAsJsonAsync(new
+        {
+            error = "Unauthorized",
+            message = "Your session has expired or your token is invalid."
+        });
+    }
+});
+
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -68,7 +82,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseExceptionHandler();
 
 app.MapIdentityApi<UserEntity>();
 

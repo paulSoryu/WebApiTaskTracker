@@ -1,6 +1,8 @@
 ﻿using System.Security.Claims;
 
 namespace WebApiTaskTracker.Utilities;
+
+// Extension method to get the user ID from the ClaimsPrincipal
 public static class ClaimsPrincipalExtensions
 {
     public static Guid GetUserId(this ClaimsPrincipal user)

@@ -24,4 +24,25 @@ public class TaskTrackerDbContext : IdentityDbContext<UserEntity, IdentityRole<G
         modelBuilder.ApplyConfiguration(new UserConfiguration());
         modelBuilder.ApplyConfiguration(new CategoryConfiguration());
     }
+
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        UpdateTimestamps();
+        return base.SaveChangesAsync(cancellationToken);
+    }
+
+    private void UpdateTimestamps()
+    {
+        var entries = ChangeTracker.Entries()
+            .Where(e => e.State == EntityState.Added);
+
+        foreach (var entry in entries)
+        {
+            var property = entry.Metadata.FindProperty("CreatedOn");
+            if (property != null)
+            {
+                entry.Property("CreatedOn").CurrentValue = DateTime.UtcNow;
+            }
+        }
+    }
 }

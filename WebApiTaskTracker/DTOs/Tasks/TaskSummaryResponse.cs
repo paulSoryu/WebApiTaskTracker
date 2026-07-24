@@ -7,8 +7,8 @@ namespace WebApiTaskTracker.DTOs.Tasks;
 public record TaskSummaryResponse(
     Guid Id,
     string Title,
-    string Category,
-    DateTime? DueDate,
+    string CategoryName,
+    DateOnly? DueDate,
     int Priority
 )
 {
@@ -17,7 +17,7 @@ public record TaskSummaryResponse(
         return new TaskSummaryResponse(
             Id: entity.Id,
             Title: entity.Title,
-            Category: entity.Category?.Title ?? string.Empty,
+            CategoryName: entity.Category?.Title ?? string.Empty,
             DueDate: entity.DueDate,
             Priority: entity.Priority
         );

@@ -1,6 +1,7 @@
 ﻿using System;
 using FluentValidation;
 using WebApiTaskTracker.Data.Entities;
+using WebApiTaskTracker.Utilities;
 
 // this is a DTO for creating a task, including validation rules and a method to convert the DTO to a TaskEntity
 // this breaks the single responsibility principle, as the DTO is responsible for data transfer, conversion and validation, but it is convenient for this simple app
@@ -9,21 +10,21 @@ namespace WebApiTaskTracker.DTOs.Tasks;
 public record CreateTaskRequest(
     string Title,
     string Description,
-    string Category,
-    DateTime DueDate,
+    string CategoryName,
+    DateOnly? DueDate,
     int Priority
 )
 {
-    public TaskEntity ToEntity(CategoryEntity? category, Guid userId)
+    public TaskEntity ToEntity(Guid? categoryId, Guid userId)
     {
         return new TaskEntity
         {
             Title = this.Title,
             Description = this.Description,
-            DueDate = this.DueDate,
+            DueDate = this.DueDate ?? DateOnly.FromDateTime(DateTime.Now.AddDays(1)),
             Priority = this.Priority,
-            CreatedAt = DateTime.UtcNow,
-            Category = category,
+            CreatedAt = DateTime.Now,
+            CategoryId = categoryId,
             UserId = userId
         };
     }
@@ -34,17 +35,17 @@ public record CreateTaskRequest(
         {
             RuleFor(x => x.Title)
                 .NotEmpty().WithMessage("Title cannot be empty.")
-                .MinimumLength(3).WithMessage("Title must be at least 3 characters.")
-                .MaximumLength(20).WithMessage("Title must be at most 20 characters.");
+                .MinimumLength(TaskConstraints.TitleMinLength).WithMessage($"Title must be at least {TaskConstraints.TitleMinLength} characters.")
+                .MaximumLength(TaskConstraints.TitleMaxLength).WithMessage($"Title must be at most {TaskConstraints.TitleMaxLength} characters.");
 
             RuleFor(x => x.Description)
-                .MaximumLength(2000).WithMessage("Description must be at most 2000 characters.");
+                .MaximumLength(TaskConstraints.DescriptionMaxLength).WithMessage($"Description must be at most {TaskConstraints.DescriptionMaxLength} characters.");
 
-            RuleFor(x => x.DueDate.Date)
-                .GreaterThanOrEqualTo(DateTime.UtcNow.Date).WithMessage("Due date must be today or in the future.");
+            RuleFor(x => x.DueDate)
+                .GreaterThanOrEqualTo(DateOnly.FromDateTime(DateTime.Now)).WithMessage("Due date must be today or in the future.");
 
             RuleFor(x => x.Priority)
-                .InclusiveBetween(1, 5).WithMessage("Priority must be between 1 and 5.");
+                .InclusiveBetween(TaskConstraints.PriorityMinValue, TaskConstraints.PriorityMaxValue).WithMessage($"Priority must be between {TaskConstraints.PriorityMinValue} and {TaskConstraints.PriorityMaxValue}.");
         }
     }
 }

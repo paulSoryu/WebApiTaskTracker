@@ -21,9 +21,12 @@ public class TaskService : ITaskService
 
     public async Task<TaskResponse?> GetByIdAsync(Guid id)
     {
-        var task = await _db.Tasks.FindAsync(id);
+        var task = await _db.Tasks
+            .AsNoTracking()
+            .Include(t => t.Category)
+            .FirstOrDefaultAsync(t => t.Id == id);
         if (task == null)
-            return null;
+            throw new EntityNotFoundException($"Task {id} not found.");
 
         return TaskResponse.FromEntity(task);
     }
@@ -31,52 +34,85 @@ public class TaskService : ITaskService
     public async Task<IEnumerable<TaskSummaryResponse>> GetAllAsync()
     {
         var result = await _db.Tasks
+            .AsNoTracking()
+            .Include(t => t.Category)
             .Select(p => TaskSummaryResponse.FromEntity(p))
             .ToListAsync();
 
         return result;
     }
 
-    // Bug with categoryEntity trying to write into categories List
-    public async Task<TaskResponse> CreateAsync(CreateTaskRequest task, Guid userId)
+    public async Task<TaskResponse> CreateAsync(CreateTaskRequest dto, Guid userId)
     {
-        CategoryEntity? category = null;
+        Guid? categoryId = null;
 
-        if (!string.IsNullOrWhiteSpace(task.Category))
+        if (!string.IsNullOrWhiteSpace(dto.CategoryName))
         {
-            var normalizedName = task.Category.Trim();
-
-            category = await _db.Categories.FirstOrDefaultAsync(c => c.Title.ToLower() == normalizedName.ToLower());
+            var normalizedName = dto.CategoryName.Trim().ToLower();
+            var category = await _db.Categories
+                .FirstOrDefaultAsync(c => c.Title.ToLower() == normalizedName);
 
             if (category == null)
             {
-                category = new CategoryEntity { Title = normalizedName, UserId = userId};
-                _db.Categories.Add(category); 
+                category = new CategoryEntity
+                {
+                    Id = Guid.NewGuid(),
+                    Title = dto.CategoryName.Trim(),
+                    UserId = userId
+                };
+                _db.Categories.Add(category);
+                await _db.SaveChangesAsync();
             }
+
+            categoryId = category.Id;
         }
 
-        var entity = task.ToEntity(category, userId);
-        _db.Tasks.Add(entity);
+        var entity = dto.ToEntity(categoryId, userId);
 
+        _db.Tasks.Add(entity);
         await _db.SaveChangesAsync();
+
         return TaskResponse.FromEntity(entity);
     }
 
-    public async Task UpdateAsync(Guid id, UpdateTaskRequest task)
+    public async Task UpdateAsync(Guid taskId, UpdateTaskRequest dto)
     {
-        var existingTask = await _db.Tasks.FindAsync(id);
+        var existingTask = await _db.Tasks.FindAsync(taskId);
         if (existingTask == null)
-            throw new EntityNotFoundException($"Task {id} not found.");
+            throw new EntityNotFoundException($"Task {taskId} not found.");
 
-        task.UpdateEntity(existingTask);
+        Guid? categoryId = null;
+
+        if (!string.IsNullOrWhiteSpace(dto.CategoryName))
+        {
+            var normalizedName = dto.CategoryName.Trim().ToLower();
+            var category = await _db.Categories
+                .FirstOrDefaultAsync(c => c.Title.ToLower() == normalizedName);
+
+            if (category == null)
+            {
+                category = new CategoryEntity
+                {
+                    Id = Guid.NewGuid(),
+                    Title = dto.CategoryName.Trim(),
+                    UserId = existingTask.UserId
+                };
+                _db.Categories.Add(category);
+                await _db.SaveChangesAsync();
+            }
+
+            categoryId = category.Id;
+        }
+
+        dto.UpdateEntity(existingTask, categoryId);
         await _db.SaveChangesAsync();
     }
 
-    public async Task DeleteAsync(Guid id)
+    public async Task DeleteAsync(Guid taskId)
     {
-        var existingTask = await _db.Tasks.FindAsync(id);
+        var existingTask = await _db.Tasks.FindAsync(taskId);
         if (existingTask == null)
-            throw new EntityNotFoundException($"Task {id} not found.");
+            throw new EntityNotFoundException($"Task {taskId} not found.");
 
         _db.Remove(existingTask);
         await _db.SaveChangesAsync();

@@ -5,18 +5,16 @@ public class TaskConstraints
     public const int TitleMinLength = 3;
     public const int TitleMaxLength = 50;
     public const int DescriptionMaxLength = 100;
+    public const int PriorityMinValue = 1;
+    public const int PriorityMaxValue = 3;
 }
 
 public class UserConstraints
 {
-    public const int NameMinLength = 3;
-    public const int NameMaxLength = 50;
-    public const int EmailAddressMaxLength = 256;
+    // User constraints in case you want to add any specific constraints for user properties in the future
 }
 
 public class CategoryConstraints
 {
     public const int TitleMaxLength = 20;
-    public const int DescriptionMaxLength = 2000;
-    public const int ColorValue = 0;
 }

@@ -9,19 +9,6 @@ public class UserConfiguration : IEntityTypeConfiguration<UserEntity>
 {
     public void Configure(EntityTypeBuilder<UserEntity> builder)
     {
-        builder.ToTable("Users");
-
-        builder.HasKey(p => p.Id);
-
-        builder.Property(p => p.UserName)
-               .IsRequired()
-               .HasMaxLength(UserConstraints.NameMaxLength);
-
-        builder.Property(p => p.Email)
-               .IsRequired()
-               .HasMaxLength(UserConstraints.EmailAddressMaxLength);
-
-        builder.HasIndex(p => p.Email)
-               .IsUnique();
+        // Configure the UserEntity properties and relationships in case you need to customize the default behavior of IdentityUser<Guid>
     }
 }

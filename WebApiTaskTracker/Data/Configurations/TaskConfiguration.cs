@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using WebApiTaskTracker.Data.Entities;
+using WebApiTaskTracker.Utilities;
 
 namespace WebApiTaskTracker.Data.Configurations;
 
@@ -24,15 +25,19 @@ public class TaskConfiguration : IEntityTypeConfiguration<TaskEntity>
 
         builder.Property(p => p.Title)
                .IsRequired()
-               .HasMaxLength(150);
+               .HasMaxLength(TaskConstraints.TitleMaxLength);
 
         builder.Property(p => p.Description)
-               .HasMaxLength(2000);
+               .HasMaxLength(TaskConstraints.DescriptionMaxLength);
 
         builder.Property(p => p.DueDate)
                .IsRequired();
 
-        builder.Property(p => p.Priority)
+        builder.Property(p => p.CreatedAt)
                .IsRequired();
+
+        builder.Property(p => p.Priority)
+               .IsRequired()
+               .HasPrecision(1, 0);
     }
 }
